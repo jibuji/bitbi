@@ -1,0 +1,14 @@
+45.152.65.170:9801
+149.104.26.94:9801
+149.104.27.226:9801
+120.27.211.168:9801
+[2001:df1:7880:2::333]:9801 # yc2c4y-1
+
+# manually updated 2024-01 for minimal torv3 bootstrap support
+hcd2l7xudjg6ihjjlwfeddqjyj3zto2lhbmndgt42rknsl5bu6plr5qd.onion:9801
+
+# manually updated 2024-01 for minimal i2p bootstrap support
+#255fhcp6ajvftnyo7bwz3an3t4a4brhopm3bamyh2iu5r3gnr2rq.b32.i2p:0
+
+# manually updated 2024-01 for minimal cjdns bootstrap support
+

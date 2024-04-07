@@ -1,0 +1,9 @@
+
+# manually updated 2023-04 for minimal torv3 bootstrap support
+
+
+# manually updated 2023-04 for minimal i2p bootstrap support
+
+
+# manually updated 2023-04 for minimal cjdns bootstrap support
+
