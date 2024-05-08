@@ -1,9 +1,9 @@
 package=randomx
 $(package)_version=0.2.1
-$(package)_download_path=https://github.com/imnotsatosh/BtbPow/archive/refs/tags
+$(package)_download_path=https://codeload.github.com/bitbi-core/pow/tar.gz/refs/tags
 $(package)_file_name=v$($(package)_version).tar.gz
-$(package)_download_file=v$($(package)_version).tar.gz
-$(package)_sha256_hash=8989c8f8b694bade8e55e47b38731c34e94f7828f8981bbdab7da778240dee56
+$(package)_download_file=v$($(package)_version)
+$(package)_sha256_hash=f3e0c7165af9fd0474f985537a8f25a3ba0daeb9bed538890fbcba35acb1a370
 
 define $(package)_preprocess_cmds
 	cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub . 

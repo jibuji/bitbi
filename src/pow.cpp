@@ -12,7 +12,13 @@
 #include "hash.h"
 #include "util/syncstack.h"
 #include "common/stopwatch.h"
-#include <sys/sysinfo.h>
+#ifdef __linux__ 
+    #include <sys/sysinfo.h>
+#elif _WIN32
+    #include <windows.h>
+#else
+    #error "Unknown compiler"
+#endif
 
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
@@ -285,6 +291,7 @@ public:
     }
 };
 
+#ifdef __linux__
 static inline uint64_t FreePhysicalMemory() {
     struct sysinfo memInfo;
 
@@ -294,6 +301,17 @@ static inline uint64_t FreePhysicalMemory() {
     freePhysMem *= memInfo.mem_unit;
     return freePhysMem;
 }
+#elif _WIN32
+static inline uint64_t FreePhysicalMemory() {
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    DWORDLONG freeRAM = statex.ullAvailPhys;
+    return freeRAM;
+}
+#else
+    #error "Unknown compiler"
+#endif
 
 class RxWorkVerifier3
 {
