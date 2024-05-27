@@ -5,6 +5,7 @@ $(package)_file_name=v$($(package)_version).tar.gz
 $(package)_download_file=v$($(package)_version)
 $(package)_sha256_hash=f3e0c7165af9fd0474f985537a8f25a3ba0daeb9bed538890fbcba35acb1a370
 
+
 define $(package)_preprocess_cmds
 	cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub . 
 endef

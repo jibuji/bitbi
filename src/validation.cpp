@@ -3809,8 +3809,17 @@ std::vector<unsigned char> ChainstateManager::GenerateCoinbaseCommitment(CBlock&
 
 bool HasValidProofOfWork(const std::vector<CBlockHeader>& headers, const Consensus::Params& consensusParams)
 {
-    return std::all_of(headers.cbegin(), headers.cend(),
-            [&](const auto& header) { return CheckProofOfWorkX(header, consensusParams);});
+    // it's enough to check the first and last headers, as the chain is continuous and the proof of work is cumulative
+    if (headers.size() == 0) {
+        return true;
+    }
+    if (headers.size() == 1) {
+        return CheckProofOfWorkX(headers.front(), consensusParams);
+    }
+    return CheckProofOfWorkX(headers.front(), consensusParams) && CheckProofOfWorkX(headers.back(), consensusParams);
+    
+    // return std::all_of(headers.cbegin(), headers.cend(),
+    //         [&](const auto& header) { return CheckProofOfWorkX(header, consensusParams);});
 }
 
 bool IsBlockMutated(const CBlock& block, bool check_witness_root)

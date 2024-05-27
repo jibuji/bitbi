@@ -1,10 +1,10 @@
 Bitbi Core integration/staging tree
 =====================================
 
-https://bitbi.org
+https://bitbicore.org
 
 For an immediately usable, binary version of the Bitbi Core software, see
-https://bitbi.org/install/#node.
+https://bitbicore.org/en/download/.
 
 What is Bitbi Core?
 ---------------------
@@ -27,6 +27,11 @@ Development Process
 The `master` branch is regularly built (see `doc/build-*.md` for instructions) and tested, but it is not guaranteed to be
 completely stable. [Tags](https://github.com/bitbi/bitbi/tags) are created
 regularly from release branches to indicate new official, stable release versions of Bitbi Core.
+
+The https://github.com/bitbi-core/gui repository is used exclusively for the
+development of the GUI. Its master branch is identical in all monotree
+repositories. Release branches and tags do not exist, so please do not fork
+that repository unless it is for development reasons.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
 and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
@@ -60,3 +65,14 @@ code. This is especially important for large or high-risk changes. It is useful
 to add a test plan to the pull request description if testing the changes is
 not straightforward.
 
+Translations
+------------
+
+Changes to translations as well as new translations can be submitted to
+[Bitbi Core's Transifex page](https://www.transifex.com/bitbi/bitbi/).
+
+Translations are periodically pulled from Transifex and merged into the git repository. See the
+[translation process](doc/translation_process.md) for details on how this works.
+
+**Important**: We do not accept translation changes as GitHub pull requests because the next
+pull from Transifex would automatically overwrite them again.

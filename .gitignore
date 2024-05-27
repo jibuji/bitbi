@@ -15,6 +15,18 @@ src/test/fuzz/fuzz
 src/test/test_bitcoin
 src/qt/test/test_bitcoin-qt
 
+src/bitbi
+src/bitbid
+src/bitbi-cli
+src/bitbi-gui
+src/bitbi-node
+src/bitbi-tx
+src/bitbi-util
+src/bitbi-chainstate
+src/bitbi-wallet
+src/test/test_bitbi
+src/qt/test/test_bitbi-qt
+
 # autoreconf
 Makefile.in
 aclocal.m4
@@ -39,6 +51,8 @@ configure
 libtool
 src/config/bitcoin-config.h
 src/config/bitcoin-config.h.in
+src/config/bitbi-config.h
+src/config/bitbi-config.h.in
 src/config/stamp-h1
 src/obj
 share/setup.nsi
@@ -55,6 +69,12 @@ src/qt/bitcoin-qt.creator
 src/qt/bitcoin-qt.creator.user
 src/qt/bitcoin-qt.files
 src/qt/bitcoin-qt.includes
+
+src/qt/bitbi-qt.config
+src/qt/bitbi-qt.creator
+src/qt/bitbi-qt.creator.user
+src/qt/bitbi-qt.files
+src/qt/bitbi-qt.includes
 
 .deps
 .dirstamp
@@ -93,6 +113,7 @@ src/qt/bitcoin-qt.includes
 Makefile
 !depends/Makefile
 src/qt/bitcoin-qt
+src/qt/bitbi-qt
 Bitcoin-Qt.app
 
 # Qt Creator
@@ -101,6 +122,7 @@ Makefile.am.user
 # Unit-tests
 Makefile.test
 bitcoin-qt_test
+bitbi-qt_test
 
 # Resources cpp
 qrc_*.cpp
@@ -117,6 +139,7 @@ releases
 *.gcda
 /*.info
 test_bitcoin.coverage/
+test_bitbi.coverage/
 total.coverage/
 fuzz.coverage/
 coverage_percent.txt
@@ -136,6 +159,7 @@ test/.mypy_cache/
 /doc/doxygen/
 
 libbitcoinconsensus.pc
+libbitbiconsensus.pc
 contrib/devtools/split-debug.sh
 
 # Output from running db4 installation
@@ -150,4 +174,4 @@ dist/
 /guix-build-*
 
 /ci/scratch/
-private-tools/
+# private-tools/

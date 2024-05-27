@@ -1,5 +1,5 @@
-#ifndef SYNCSTACK_H
-#define SYNCSTACK_H
+#ifndef BITBI_UTIL_SYNCSTACK_H
+#define BITBI_UTIL_SYNCSTACK_H
 
 #include <stack>
 #include <mutex>

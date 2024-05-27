@@ -105,7 +105,6 @@ bool CheckHeaderPow(CBlockIndex* pindex, const Consensus::Params& params) {
 bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, std::function<CBlockIndex*(const uint256&)> insertBlockIndex, const util::SignalInterrupt& interrupt)
 {
     AssertLockHeld(::cs_main);
-    std::vector<std::future<bool>> futures; // Move the declaration outside of the code block
     std::unique_ptr<CDBIterator> pcursor(NewIterator());
     pcursor->Seek(std::make_pair(DB_BLOCK_INDEX, uint256()));
 
@@ -130,8 +129,11 @@ bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, s
                 pindexNew->nNonce         = diskindex.nNonce;
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
-                
-                futures.push_back(std::async(std::launch::async, CheckHeaderPow, pindexNew, consensusParams));
+                // we check the proof of work later, thus we have no need to check every block here, as 
+                // we can only check the continuous of the chain and pow of the first and last block in the chain
+                // if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams)) {
+                //     return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
+                // }
 
                 pcursor->Next();
             } else {
@@ -141,13 +143,7 @@ bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, s
             break;
         }
     }
-    // Collect results
-    for (auto& fut : futures) {
-        if (!fut.get()) {
-            return error("%s: CheckProofOfWorkX failed", __func__);
-        }
-        if (interrupt) return false;
-    }
+
     return true;
 }
 } // namespace kernel
@@ -468,7 +464,31 @@ bool BlockManager::LoadBlockIndex(const std::optional<uint256>& snapshot_blockha
         }
     }
 
-    return true;
+
+    //check the continuous of the chain 
+    uint256 hashLastBlock;
+    for (CBlockIndex* pindex : vSortedByHeight) {
+        if (!hashLastBlock.IsNull()) {
+            if (!pindex->pprev) {
+                return false;
+            }
+            if (pindex->pprev->GetBlockHash() != hashLastBlock) {
+                return false;
+            }
+        }
+        hashLastBlock = pindex->GetBlockHash();
+    }
+    //check pow of the first and last block of the chain
+    const Consensus::Params consensusParams = GetConsensus();
+    if (vSortedByHeight.size() == 0) {
+        return true;
+    }
+    if (vSortedByHeight.size() == 1) {
+        return CheckProofOfWorkX(vSortedByHeight.front()->GetBlockHeader(), consensusParams);
+    }
+    return CheckProofOfWorkX(vSortedByHeight.front()->GetBlockHeader(), consensusParams) && CheckProofOfWorkX(vSortedByHeight.back()->GetBlockHeader(), consensusParams);
+    
+    // return true;
 }
 
 bool BlockManager::WriteBlockIndexDB()

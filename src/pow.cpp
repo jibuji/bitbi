@@ -20,7 +20,6 @@
     #error "Unknown compiler"
 #endif
 
-
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
     assert(pindexLast != nullptr);
@@ -291,6 +290,7 @@ public:
     }
 };
 
+
 #ifdef __linux__
 static inline uint64_t FreePhysicalMemory() {
     struct sysinfo memInfo;
@@ -312,6 +312,7 @@ static inline uint64_t FreePhysicalMemory() {
 #else
     #error "Unknown compiler"
 #endif
+
 
 class RxWorkVerifier3
 {
