@@ -5,7 +5,7 @@
 """Script for verifying Bitbi Core release binaries.
 
 This script attempts to download the sum file SHA256SUMS and corresponding
-signature file SHA256SUMS.asc from bitbicore.org and bitbi.org and
+signature file SHA256SUMS.asc from bitbi.org and bitbi.org and
 compares them.
 
 The sum-signature file is signed by a number of builder keys. This script
@@ -46,7 +46,7 @@ from hashlib import sha256
 from pathlib import PurePath, Path
 
 # The primary host; this will fail if we can't retrieve files from here.
-HOST1 = "https://bitbicore.org"
+HOST1 = "https://bitbi.org"
 HOST2 = "https://bitbi.org"
 VERSIONPREFIX = "bitbi-core-"
 SUMS_FILENAME = 'SHA256SUMS'
@@ -517,7 +517,7 @@ def verify_published_handler(args: argparse.Namespace) -> ReturnCode:
         log.error("no files matched the platform specified")
         return ReturnCode.NO_BINARIES_MATCH
 
-    # remove binaries that are known not to be hosted by bitbicore.org
+    # remove binaries that are known not to be hosted by bitbi.org
     fragments_to_remove = ['-unsigned', '-debug', '-codesignatures']
     for fragment in fragments_to_remove:
         nobinaries = [i for i in hashes_to_verify if fragment in i[1]]
@@ -690,7 +690,7 @@ def main():
         default=bool_from_env('BINVERIFY_REQUIRE_ALL_HOSTS'),
         help=(
             f'If set, require all hosts ({HOST1}, {HOST2}) to provide signatures. '
-            '(Sometimes bitbi.org lags behind bitbicore.org.)')
+            '(Sometimes bitbi.org lags behind bitbi.org.)')
     )
 
     bin_parser = subparsers.add_parser("bin", help="Verify local binaries.")

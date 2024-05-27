@@ -1,10 +1,10 @@
 Bitbi Core integration/staging tree
 =====================================
 
-https://bitbicore.org
+https://bitbi.org
 
 For an immediately usable, binary version of the Bitbi Core software, see
-https://bitbicore.org/en/download/.
+https://bitbi.org/en/download/.
 
 What is Bitbi Core?
 ---------------------

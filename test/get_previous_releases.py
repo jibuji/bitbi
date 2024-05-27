@@ -128,7 +128,7 @@ def download_binary(tag, args) -> int:
         platform = "osx64"
     tarball = 'bitbi-{tag}-{platform}.tar.gz'.format(
         tag=tag[1:], platform=platform)
-    tarballUrl = 'https://bitbicore.org/{bin_path}/{tarball}'.format(
+    tarballUrl = 'https://bitbi.org/{bin_path}/{tarball}'.format(
         bin_path=bin_path, tarball=tarball)
 
     print('Fetching: {tarballUrl}'.format(tarballUrl=tarballUrl))

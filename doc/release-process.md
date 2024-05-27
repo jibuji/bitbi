@@ -223,7 +223,7 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
 ```
 
 
-- Upload to the bitbicore.org server (`/var/www/bin/bitbi-core-${VERSION}/`):
+- Upload to the bitbi.org server (`/var/www/bin/bitbi-core-${VERSION}/`):
     1. The contents of each `./bitbi/guix-build-${VERSION}/output/${HOST}/` directory, except for
        `*-debug*` files.
 
@@ -236,11 +236,11 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
        for troubleshooting by developers. It is assumed that anyone that is
        interested in debugging can run guix to generate the files for
        themselves. To avoid end-user confusion about which file to pick, as well
-       as save storage space *do not upload these to the bitbicore.org server,
+       as save storage space *do not upload these to the bitbi.org server,
        nor put them in the torrent*.
 
        ```sh
-       find guix-build-${VERSION}/output/ -maxdepth 2 -type f -not -name "SHA256SUMS.part" -and -not -name "*debug*" -exec scp {} user@bitbicore.org:/var/www/bin/bitbi-core-${VERSION} \;
+       find guix-build-${VERSION}/output/ -maxdepth 2 -type f -not -name "SHA256SUMS.part" -and -not -name "*debug*" -exec scp {} user@bitbi.org:/var/www/bin/bitbi-core-${VERSION} \;
        ```
 
     2. The `SHA256SUMS` file
@@ -259,24 +259,24 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
   ```
 
   Insert the magnet URI into the announcement sent to mailing lists. This permits
-  people without access to `bitbicore.org` to download the binary distribution.
+  people without access to `bitbi.org` to download the binary distribution.
   Also put it into the `optional_magnetlink:` slot in the YAML file for
-  bitbicore.org.
+  bitbi.org.
 
 - Update other repositories and websites for new version
 
-  - bitbicore.org blog post
+  - bitbi.org blog post
 
-  - bitbicore.org maintained versions update:
-    [table](https://github.com/bitbi-core/bitbicore.org/commits/master/_includes/posts/maintenance-table.md)
+  - bitbi.org maintained versions update:
+    [table](https://github.com/bitbi-core/bitbi.org/commits/master/_includes/posts/maintenance-table.md)
 
   - Delete post-EOL [release branches](https://github.com/bitbi/bitbi/branches/all) and create a tag `v${branch_name}-final`.
 
   - Delete ["Needs backport" labels](https://github.com/bitbi/bitbi/labels?q=backport) for non-existing branches.
 
-  - bitbicore.org RPC documentation update
+  - bitbi.org RPC documentation update
 
-      - See https://github.com/bitbi-core/bitbicore.org/blob/master/contrib/doc-gen/
+      - See https://github.com/bitbi-core/bitbi.org/blob/master/contrib/doc-gen/
 
   - Update packaging repo
 
@@ -294,7 +294,7 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
 
   - bitbi-dev and bitbi-core-dev mailing list
 
-  - Bitbi Core announcements list https://bitbicore.org/en/list/announcements/join/
+  - Bitbi Core announcements list https://bitbi.org/en/list/announcements/join/
 
   - Bitbi Core Twitter https://twitter.com/bitbicoreorg
 

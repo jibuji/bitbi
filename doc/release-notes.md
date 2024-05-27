@@ -3,7 +3,7 @@
 
 Bitbi Core version 26.1 is now available from:
 
-  <https://bitbicore.org/bin/bitbi-core-26.1/>
+  <https://bitbi.org/bin/bitbi-core-26.1/>
 
 This release includes various bug fixes and performance
 improvements, as well as updated translations.
@@ -14,7 +14,7 @@ Please report bugs using the issue tracker at GitHub:
 
 To receive security and update notifications, please subscribe to:
 
-  <https://bitbicore.org/en/list/announcements/join/>
+  <https://bitbi.org/en/list/announcements/join/>
 
 How to Upgrade
 ==============
