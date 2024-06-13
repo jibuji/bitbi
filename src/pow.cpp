@@ -328,6 +328,11 @@ public:
         const uint64_t freeMemory = FreePhysicalMemory();
         LogPrintf("RxWorkVerifier3 FreePhysicalMemory=%ld\n", freeMemory);
         m_nCaches = std::min((int)(1*std::thread::hardware_concurrency()), (int)(freeMemory/ONE_CACHE_SIZE));
+        if (m_nCaches <= 0) {
+            // LogPrintLevel(BCLog::NET, BCLog::Level::Debug, 
+            LogPrintLevel(BCLog::ALL, BCLog::Level::Error, "RxWorkVerifier3 FreePhysicalMemory too small, try to use 1 cache\n");
+            m_nCaches = 1;
+        }
         for (int i = 0; i < m_nCaches; ++i) {
             VerifierCtx* cache = new VerifierCtx(uint256());
             mCacheStack.push(cache);
