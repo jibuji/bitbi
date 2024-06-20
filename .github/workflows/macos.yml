@@ -23,10 +23,10 @@ jobs:
         brew install automake libtool boost pkg-config libevent llvm
         # download latest version of pow
         POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-macos-13.tar.gz"
-        # POW_HOME="$HOME/pow"
-        curl -L $POW_URL | tar xz -C $HOME
-        ls -l $HOME
-        
+        POW_HOME="$HOME/pow"
+        curl -L $POW_URL | tar xz -C $POW_HOME
+        ls -l $POW_HOME
+
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
@@ -39,7 +39,8 @@ jobs:
         echo "CC=$CC"
         echo "CXX=$CXX"
         ./autogen.sh
-        ./configure --without-wallet --with-gui=no
+        POW_HOME="$HOME/pow"
+        ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
         make -j src/bitbid
 
     - name: Upload config.log
