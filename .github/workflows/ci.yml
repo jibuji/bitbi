@@ -9,9 +9,7 @@ on:
   # See: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push.
   push:
     branches:
-      - '**'
-    tags-ignore:
-      - '**'
+      - 'xxxxxx'
 
 concurrency:
   group: ${{ github.event_name != 'pull_request' && github.run_id || github.ref }}

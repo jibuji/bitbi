@@ -14,17 +14,22 @@ testing compared to other parts of the codebase. If you want to keep the work tr
 system in a virtual machine with a Linux operating system of your choice.
 
 To allow for a wide range of tested environments, but also ensure reproducibility to some extent, the test stage
-requires `bash`, `docker`, and `python3` to be installed. To install all requirements on Ubuntu, run
+requires `docker` to be installed. To install all requirements on Ubuntu, run
 
 ```
-sudo apt install bash docker.io python3
+sudo apt install docker.io bash
 ```
 
-It is recommended to run the ci system in a clean env. To run the test stage
-with a specific configuration,
+To run the default test stage,
 
 ```
-env -i HOME="$HOME" PATH="$PATH" USER="$USER" bash -c 'FILE_ENV="./ci/test/00_setup_env_arm.sh" ./ci/test_run_all.sh'
+./ci/test_run_all.sh
+```
+
+To run the test stage with a specific configuration,
+
+```
+FILE_ENV="./ci/test/00_setup_env_arm.sh" ./ci/test_run_all.sh
 ```
 
 ### Configurations
@@ -39,11 +44,14 @@ the system package manager to install build dependencies. This guarantees that
 the tester is using the same versions as the release builds, which also use
 `./depends`.
 
+If no `FILE_ENV` has been specified or values are left out, `00_setup_env.sh`
+is used as the default configuration with fallback values.
+
 It is also possible to force a specific configuration without modifying the
 file. For example,
 
 ```
-env -i HOME="$HOME" PATH="$PATH" USER="$USER" bash -c 'MAKEJOBS="-j1" FILE_ENV="./ci/test/00_setup_env_arm.sh" ./ci/test_run_all.sh'
+MAKEJOBS="-j1" FILE_ENV="./ci/test/00_setup_env_arm.sh" ./ci/test_run_all.sh
 ```
 
 The files starting with `0n` (`n` greater than 0) are the scripts that are run

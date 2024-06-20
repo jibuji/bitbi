@@ -1,0 +1,39 @@
+name: build-macos
+
+on:
+  push:
+    branches: [ "mtest" ]
+  pull_request:
+
+jobs:
+  build-macos:
+
+    timeout-minutes: 5
+    runs-on: ${{ matrix.config.os }}
+
+    strategy:
+      matrix:
+        config:
+          - {os: macos-13}
+
+    steps:
+    - name: Install dependencies
+      run: |
+        echo "begin..."
+
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build Bitbi-Node
+      run: |
+        ./ci/build-on-macos.sh
+
+    - name: Upload config.log
+      if: failure() # Only run this step if a previous step failed
+      uses: actions/upload-artifact@v2
+      with:
+        name: config.log
+        path: ./config.log
