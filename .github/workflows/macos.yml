@@ -8,13 +8,14 @@ on:
 jobs:
   build-macos:
 
-    timeout-minutes: 20
+    timeout-minutes: 30
     runs-on: ${{ matrix.config.os }}
 
     strategy:
       matrix:
         config:
           - {os: macos-13, pow: 0.2.2}
+          - {os: macos-14, pow: 0.2.2}
 
     steps:
     - name: Install dependencies
@@ -43,7 +44,8 @@ jobs:
         POW_HOME="$HOME/pow"
         ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
         mkdir -p depends/lib
-        make -j src/bitbid
+        make -j$(nproc) src/bitbid
+        mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
 
     - name: Upload config.log
       if: failure() # Only run this step if a previous step failed
@@ -51,3 +53,9 @@ jobs:
       with:
         name: config.log
         path: ./config.log
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bitbid-${{ matrix.config.os }}
+        path: ./bitbid-${{ matrix.config.os }}
