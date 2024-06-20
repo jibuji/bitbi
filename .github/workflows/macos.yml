@@ -14,15 +14,19 @@ jobs:
     strategy:
       matrix:
         config:
-          - {os: macos-13}
+          - {os: macos-13, pow: 0.2.2}
 
     steps:
     - name: Install dependencies
       run: |
         echo "begin..."
         brew install automake libtool boost pkg-config libevent llvm
-
-
+        # download latest version of pow
+        POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-macos-13.tar.gz"
+        # POW_HOME="$HOME/pow"
+        curl -L $POW_URL | tar xz -C $HOME
+        ls -l $HOME
+        
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
