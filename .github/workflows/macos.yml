@@ -8,7 +8,7 @@ on:
 jobs:
   build-macos:
 
-    timeout-minutes: 5
+    timeout-minutes: 20
     runs-on: ${{ matrix.config.os }}
 
     strategy:
@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         echo "begin..."
-        brew install automake libtool boost pkg-config libevent
+        brew install automake libtool boost pkg-config libevent llvm
         # download latest version of pow
         POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-macos-13.tar.gz"
         POW_HOME="$HOME/pow"
