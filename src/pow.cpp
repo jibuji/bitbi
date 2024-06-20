@@ -12,13 +12,56 @@
 #include "hash.h"
 #include "util/syncstack.h"
 #include "common/stopwatch.h"
-#ifdef __linux__ 
-    #include <sys/sysinfo.h>
+
+
+
+#ifdef __linux__
+#include <sys/sysinfo.h>
+static inline uint64_t FreePhysicalMemory() {
+    struct sysinfo memInfo;
+
+    sysinfo (&memInfo);
+    long long freePhysMem = memInfo.freeram;
+    // to bytes
+    freePhysMem *= memInfo.mem_unit;
+    return freePhysMem;
+}
 #elif _WIN32
-    #include <windows.h>
+#include <windows.h>
+static inline uint64_t FreePhysicalMemory() {
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    DWORDLONG freeRAM = statex.ullAvailPhys;
+    return freeRAM;
+}
+#elif __APPLE__
+#include <mach/mach_host.h>
+#include <mach/vm_statistics.h>
+
+static inline uint64_t FreePhysicalMemory() {
+    vm_size_t page_size;
+    vm_statistics64_data_t vm_stats;
+    mach_port_t mach_port = mach_host_self();
+    mach_msg_type_number_t count = sizeof(vm_stats) / sizeof(natural_t);
+
+    if (KERN_SUCCESS == host_page_size(mach_port, &page_size) &&
+        KERN_SUCCESS == host_statistics64(mach_port, HOST_VM_INFO,
+                                          (host_info64_t)&vm_stats, &count))
+    {
+        uint64_t free_memory = (uint64_t)vm_stats.free_count * (uint64_t)page_size;
+
+        return free_memory;
+    }
+    else
+    {
+        return 0;
+    }
+}
 #else
     #error "Unknown compiler"
 #endif
+
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
@@ -290,28 +333,6 @@ public:
     }
 };
 
-
-#ifdef __linux__
-static inline uint64_t FreePhysicalMemory() {
-    struct sysinfo memInfo;
-
-    sysinfo (&memInfo);
-    long long freePhysMem = memInfo.freeram;
-    // to bytes
-    freePhysMem *= memInfo.mem_unit;
-    return freePhysMem;
-}
-#elif _WIN32
-static inline uint64_t FreePhysicalMemory() {
-    MEMORYSTATUSEX statex;
-    statex.dwLength = sizeof(statex);
-    GlobalMemoryStatusEx(&statex);
-    DWORDLONG freeRAM = statex.ullAvailPhys;
-    return freeRAM;
-}
-#else
-    #error "Unknown compiler"
-#endif
 
 
 class RxWorkVerifier3
