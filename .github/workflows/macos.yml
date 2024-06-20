@@ -20,6 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         echo "begin..."
+        brew install automake libtool boost pkg-config libevent llvm
 
 
     - name: Checkout repository
@@ -29,7 +30,13 @@ jobs:
 
     - name: Build Bitbi-Node
       run: |
-        ./ci/build-on-macos.sh
+        export CC=$(brew --prefix llvm)/bin/clang 
+        export CXX=$(brew --prefix llvm)/bin/clang++
+        echo "CC=$CC"
+        echo "CXX=$CXX"
+        ./autogen.sh
+        ./configure --without-wallet --with-gui=no
+        make -j src/bitbid
 
     - name: Upload config.log
       if: failure() # Only run this step if a previous step failed
