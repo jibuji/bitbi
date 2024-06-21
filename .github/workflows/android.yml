@@ -98,6 +98,7 @@ jobs:
         # echo "export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
         ls depends
         ls $ANDROID_TOOLCHAIN_BIN
+        echo "before 'cd $ANDROID_TOOLCHAIN_BIN' ---------------"
         cd $ANDROID_TOOLCHAIN_BIN
         cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
         cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
