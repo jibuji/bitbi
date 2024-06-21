@@ -53,7 +53,7 @@ jobs:
 
     - name: Build Bitbid
       run: |
-        WD=$(pwd)
+        export WD=$(pwd)
         export DEPENDS_DIR=$WD/depends
         export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
@@ -80,6 +80,7 @@ jobs:
         cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
         cp llvm-nm $HOST-nm
         ls $HOST-*
+        echo "WD=$WD"
         cd $WD
 
         CONFIG_SHELL= NO_QT=1 make  -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
