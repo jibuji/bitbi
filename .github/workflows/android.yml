@@ -64,7 +64,7 @@ jobs:
 
     - name: Build Bitbid
       run: |
-        export DEPENDS_DIR="./depends"
+        export DEPENDS_DIR="$(pwd)/depends"
         ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
@@ -106,7 +106,7 @@ jobs:
         ls -l ./depends/SDKs/android/ndk/24.0.8215888/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android*
 
         CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
-        
+
         ./autogen.sh
         BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
