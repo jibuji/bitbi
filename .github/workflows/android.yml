@@ -1,0 +1,99 @@
+name: build-android
+
+on:
+  push:
+    branches: [ "mtest" ]
+  pull_request:
+
+jobs:
+  build-android:
+
+    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        config:
+          - {api_level: 23, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        sudo apt update
+        sudo apt install -y git build-essential cmake unzip openjdk-17-jdk ccache
+        sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+        ANDROID_TOOLS_PATH=${HOME}/sdk-sources/android-tools.zip
+        mkdir -p ${HOME}/sdk-sources
+        ANDROID_TOOLS_URL=https://googledownloads.cn/android/repository/commandlinetools-linux-11076708_latest.zip
+        curl --location --fail "${ANDROID_TOOLS_URL}" -o "$ANDROID_TOOLS_PATH"
+        ANDROID_HOME="${HOME}/SDKs/android"
+        mkdir -p "$ANDROID_HOME"
+        unzip -o "$ANDROID_TOOLS_PATH" -d "$ANDROID_HOME"
+        ANDROID_BUILD_TOOLS_VERSION=28.0.3
+        ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+        ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
+        JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        yes | "${ANDROID_HOME}"/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
+        ls -l "${ANDROID_HOME}"
+
+    - name: build libs
+      run: |
+        ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+        ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
+        ANDROID_ABI=${{ matrix.config.abi }}
+        POW_VERSION=${{ matrix.config.pow_version }}
+        POW_URL="https://github.com/bitbi-core/pow/releases/download/v$POW_VERSION/android-$ANDROID_ABI.tar.gz"
+        POW_HOME="$HOME/pow"
+        mkdir -p $POW_HOME
+        curl -L $POW_URL | tar xz -C $POW_HOME
+        ls -l $POW_HOME
+        
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build Bitbid
+      run: |
+        export CROSS_COMPILE_FOR_NDK=yes
+        ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
+        POW_VERSION=${{ matrix.config.pow_version }}
+        export ANDROID_HOME="${HOME}/SDKs/android"
+        export NDK_HOME="${HOME}/SDKs/android/ndk/${ANDROID_NDK_VERSION}"
+        export ANDROID_NDK_HOME=$NDK_HOME
+        export ACLOCAL_PATH="$(pwd)/m4:$ACLOCAL_PATH"
+        export CCACHE_SIZE=500M
+        ccache --zero-stats --max-size=$CCACHE_SIZE
+        ./autogen.sh
+
+        POW_HOME=$HOME/pow/pow-$POW_VERSION
+        export HOST=aarch64-linux-android
+        ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+        
+        export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
+        O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
+
+        BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
+        BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
+        BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
+        ./configure "$BITBI_CONFIG_ALL" "$BITBI_CONFIG"
+        
+        make -j$(nproc) src/bitbid
+        mv src/bitbid android-bitbid-${{ matrix.config.abi }}
+
+    - name: Upload config.log
+      if: failure() # Only run this step if a previous step failed
+      uses: actions/upload-artifact@v2
+      with:
+        name: config.log
+        path: |
+            ./config.log
+            ./depends/config.log
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-bitbid-${{ matrix.config.abi }}
+        path: ./android-bitbid-${{ matrix.config.abi }}

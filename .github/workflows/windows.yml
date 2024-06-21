@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  build-linux:
+  build-windows-msys2:
 
     timeout-minutes: 15
     runs-on: windows-latest
@@ -56,6 +56,7 @@ jobs:
         ./configure CXXFLAGS="-I/mingw64/include -I/mingw64/include/c++/13.2.0 -I/mingw64/x86_64-w64-mingw32/include -I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -L/mingw64/lib -lsodium -lrandomx" --prefix=/ --with-gui=no --with-wallet=no --disable-tests --disable-bench --disable-zmq
         mkdir -p depends/x86_64-pc-msys/lib
         make -j$(nproc) ./src/bitbid.exe
+        mv ./src/bitbid.exe windows-msys2-bitbid-${{ matrix.config.c }}.exe
 
     - name: Upload config.log
       if: failure() # Only run this step if a previous step failed
@@ -68,4 +69,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-msys2-bitbid-${{ matrix.config.c }}
-        path: windows-msys2-bitbid-${{ matrix.config.c }}
+        path: ./windows-msys2-bitbid-${{ matrix.config.c }}.exe
