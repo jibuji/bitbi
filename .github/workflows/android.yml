@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - {api_level: 23, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
+          - {api_level: 28, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
 
     steps:
     - name: Install dependencies
@@ -89,7 +89,7 @@ jobs:
         echo "HOST=$HOST" >> $GITHUB_ENV
         ./autogen.sh
         BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
-        BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
+        BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=$WD/depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
         HOST=$HOST ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG --host="$HOST"
 
