@@ -73,7 +73,7 @@ jobs:
 
 
         export HOST=aarch64-linux-android
-        exoort ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+        export ANDROID_API_LEVEL=${{ matrix.config.api_level }}
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
