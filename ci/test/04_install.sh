@@ -54,13 +54,14 @@ echo "docker run $CI_CONTAINER_CAP --rm --interactive --detach --tty \
                   --env-file /tmp/env \
                   --name $CONTAINER_NAME \
                   $CONTAINER_NAME" >> ~/command.log
+  mkdir -p $(pwd)/node-dist
   # shellcheck disable=SC2086
   CI_CONTAINER_ID=$(docker run $CI_CONTAINER_CAP --rm --interactive --detach --tty \
                   --mount type=bind,src=$BASE_ROOT_DIR,dst=/ro_base,readonly \
                   --mount "type=volume,src=${CONTAINER_NAME}_ccache,dst=$CCACHE_DIR" \
                   --mount "type=volume,src=${CONTAINER_NAME}_depends,dst=$DEPENDS_DIR" \
                   --mount "type=volume,src=${CONTAINER_NAME}_previous_releases,dst=$PREVIOUS_RELEASES_DIR" \
-                  --mount type=bind,src=$(pwd)/dist,dst=/root/bitcoin-dist \
+                  --mount type=bind,src=$(pwd)/node-dist,dst=/root/node-dist \
                   -w $BASE_ROOT_DIR \
                   --env-file /tmp/env \
                   --name $CONTAINER_NAME \
