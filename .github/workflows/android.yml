@@ -70,7 +70,7 @@ jobs:
         export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
         export CCACHE_SIZE=500M
         export DEBIAN_FRONTEND=noninteractive
-        export CCACHE_TEMPDIR=${/tmp/.ccache-temp}
+        export CCACHE_TEMPDIR=/tmp/.ccache-temp
         export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
         # The cache dir.
         # This folder exists only on the ci guest, and on the ci host as a volume.
