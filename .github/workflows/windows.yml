@@ -1,0 +1,58 @@
+name: build-windows
+
+on:
+  push:
+    branches: [ "mtest-m" ]
+  pull_request:
+
+jobs:
+  build-linux:
+
+    timeout-minutes: 30
+    runs-on: ${{ matrix.config.os }}
+
+    strategy:
+      matrix:
+        config:
+          - {os: ubuntu-22.04, pow: 0.2.2}
+
+    steps:
+    - name: Install dependencies
+      run: |
+        echo "begin..."
+        sudo apt-get -y install libsqlite3-dev libminiupnpc-dev libnatpmp-dev \
+          build-essential libtool autotools-dev automake pkg-config bsdmainutils \
+          python3 libevent-dev libboost-dev
+        # download latest version of pow
+        POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/ubuntu-${{matrix.config.os}}.tar.gz"
+        POW_HOME="$HOME/pow"
+        mkdir -p $POW_HOME
+        curl -L $POW_URL | tar xz -C $POW_HOME
+        ls -l $POW_HOME
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: true
+
+    - name: Build Bitbi-Node
+      run: |
+        ./autogen.sh
+        POW_HOME="$HOME/pow"
+        ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+        mkdir -p depends/lib
+        make -j$(nproc) src/bitbid
+        mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
+
+    - name: Upload config.log
+      if: failure() # Only run this step if a previous step failed
+      uses: actions/upload-artifact@v2
+      with:
+        name: config.log
+        path: ./config.log
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: bitbid-${{ matrix.config.os }}
+        path: ./bitbid-${{ matrix.config.os }}

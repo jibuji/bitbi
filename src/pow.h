@@ -15,7 +15,40 @@
 #include "arith_uint256.h"
 #include <primitives/block.h>
 #include <logging.h>
+#ifdef __x86_64__
 #include <cpuid.h>
+// x86-specific code here
+static inline bool isAVX2Supported() {
+    unsigned int eax, ebx, ecx, edx;
+    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+    bool osUsesXSAVE_XRSTORE = ecx & bit_XSAVE;
+    bool cpuAVX2Support = ecx & bit_AVX2;
+
+    if (osUsesXSAVE_XRSTORE && cpuAVX2Support) {
+        // Check if the OS will save the YMM registers
+        __get_cpuid(0, &eax, &ebx, &ecx, &edx);
+        return ecx & bit_OSXSAVE;
+    }
+
+    return false;
+}
+
+static inline bool isSSSE3Supported() {
+    unsigned int eax, ebx, ecx, edx;
+    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+    return ecx & bit_SSSE3;
+}
+
+#else
+// ARM-specific or generic code here
+static inline bool isAVX2Supported() {
+    return false;
+}
+
+static inline bool isSSSE3Supported() {
+    return false;
+}
+#endif
 
 
 class CBlockHeader;
@@ -51,27 +84,6 @@ static inline uint256 HashBytesToUnit256(unsigned char *hashBytes) {
     uint256 hVal;
     memcpy(hVal.begin(), hashBytes, 32);
     return hVal;
-}
-
-static inline bool isAVX2Supported() {
-    unsigned int eax, ebx, ecx, edx;
-    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
-    bool osUsesXSAVE_XRSTORE = ecx & bit_XSAVE;
-    bool cpuAVX2Support = ecx & bit_AVX2;
-
-    if (osUsesXSAVE_XRSTORE && cpuAVX2Support) {
-        // Check if the OS will save the YMM registers
-        __get_cpuid(0, &eax, &ebx, &ecx, &edx);
-        return ecx & bit_OSXSAVE;
-    }
-
-    return false;
-}
-
-static inline bool isSSSE3Supported() {
-    unsigned int eax, ebx, ecx, edx;
-    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
-    return ecx & bit_SSSE3;
 }
 
 class RxWorkMiner
