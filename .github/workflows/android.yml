@@ -29,7 +29,7 @@ jobs:
       with:
         submodules: true
 
-    - name: Install Android SDK
+    - name: Install Android SDK & make dependencies
       run: |
         ANDROID_BUILD_TOOLS_VERSION=28.0.3
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
@@ -49,45 +49,18 @@ jobs:
         
         JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
         yes | "${ANDROID_HOME}"/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
-        ls -l "${ANDROID_HOME}"
-
-
-    - name: Build Bitbid
-      run: |
-        echo "haha DEPENDS_DIR=$DEPENDS_DIR"
-        export WD=$(pwd)
-        export DEPENDS_DIR=$WD/depends
-        export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
-        POW_VERSION=${{ matrix.config.pow_version }}
-        export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
-        export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
-        export CCACHE_SIZE=500M
-        export DEBIAN_FRONTEND=noninteractive
-        export CCACHE_TEMPDIR=/tmp/.ccache-temp
-        export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
-        # The cache dir.
-        # This folder exists only on the ci guest, and on the ci host as a volume.
-        export CCACHE_DIR=$HOME/.ccache
-
-        ccache --zero-stats --max-size=$CCACHE_SIZE
-
 
         export HOST=aarch64-linux-android
         export ANDROID_API_LEVEL=${{ matrix.config.api_level }}
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
-        ls -l $ANDROID_TOOLCHAIN_BIN
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
-        echo "DEPOPTS:$DEP_OPTS"
-        cd $ANDROID_TOOLCHAIN_BIN
-        cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
-        cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
-        cp llvm-nm $HOST-nm
-        ls $HOST-*
-        echo "WD=$WD"
-        cd $WD
 
-        CONFIG_SHELL= NO_QT=1 make  -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
-        echo "HOST=$HOST" >> $GITHUB_ENV
+    - name: Build Bitbid
+      run: |
+        export WD=$(pwd)
+
+        export HOST=aarch64-linux-android
+
         ./autogen.sh
         BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=$WD/depends/$HOST/share/config.site"
