@@ -103,7 +103,7 @@ jobs:
         CONFIG_SHELL= NO_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
         ./autogen.sh
-        BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
+        BITBI_CONFIG_ALL=--enable-suppress-external-warnings 
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
         ./configure "$BITBI_CONFIG_ALL" "$BITBI_CONFIG"
