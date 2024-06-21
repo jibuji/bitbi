@@ -2,7 +2,7 @@ name: build-macos
 
 on:
   push:
-    branches: [ "mtest" ]
+    branches: [ "mtest-m" ]
   pull_request:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         config:
-          # - {os: macos-13, pow: 0.2.2}
+          - {os: macos-13, pow: 0.2.2}
           - {os: macos-14, pow: 0.2.2}
 
     steps:
