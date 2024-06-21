@@ -74,13 +74,13 @@ jobs:
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
-        # WD=$(pwd)
-        # cd $ANDROID_TOOLCHAIN_BIN
-        # cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
-        # cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
-        # cp llvm-nm $HOST-nm
-        # ls $HOST-*
-        # cd $WD
+        WD=$(pwd)
+        cd $ANDROID_TOOLCHAIN_BIN
+        cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
+        cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
+        cp llvm-nm $HOST-nm
+        ls $HOST-*
+        cd $WD
 
         CONFIG_SHELL= NO_QT=1 make  -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
         echo "HOST=$HOST" >> $GITHUB_ENV
