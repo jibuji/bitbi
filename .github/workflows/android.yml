@@ -22,7 +22,7 @@ jobs:
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt update
         sudo apt install -y git build-essential cmake unzip openjdk-17-jdk ccache \
-        build-essential libtool autotools-dev automake pkg-config bsdmainutils curl\
+        build-essential libtool autotools-dev automake pkg-config bsdmainutils curl \
         ca-certificates python3 rsync cmake git procps bison
         sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
@@ -69,6 +69,13 @@ jobs:
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
         export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
         export CCACHE_SIZE=500M
+        export DEBIAN_FRONTEND=noninteractive
+        export CCACHE_TEMPDIR=${/tmp/.ccache-temp}
+        export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
+        # The cache dir.
+        # This folder exists only on the ci guest, and on the ci host as a volume.
+        export CCACHE_DIR=$HOME/.ccache
+
         ccache --zero-stats --max-size=$CCACHE_SIZE
         ./autogen.sh
 
