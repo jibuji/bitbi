@@ -34,7 +34,8 @@ jobs:
         ANDROID_BUILD_TOOLS_VERSION=28.0.3
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
         ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
-        export DEPENDS_DIR="$HOME"
+        export WD=$(pwd)
+        export DEPENDS_DIR=$WD/depends
         export ANDROID_TOOLS_URL=https://googledownloads.cn/android/repository/commandlinetools-linux-11076708_latest.zip
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
         mkdir -p "$ANDROID_HOME"
@@ -53,8 +54,9 @@ jobs:
 
     - name: Build Bitbid
       run: |
+        echo "haha DEPENDS_DIR=$DEPENDS_DIR"
         export WD=$(pwd)
-        export DEPENDS_DIR=$HOME
+        export DEPENDS_DIR=$WD/depends
         export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
