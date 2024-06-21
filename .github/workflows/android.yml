@@ -96,16 +96,14 @@ jobs:
         # echo "export ANDROID_NDK=$ANDROID_NDK_HOME" >> $GITHUB_ENV
         # echo "export ANDROID_API_LEVEL=$ANDROID_API_LEVEL" >> $GITHUB_ENV
         # echo "export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
-        ls depends
-        ls $ANDROID_TOOLCHAIN_BIN
-        echo "before 'cd $ANDROID_TOOLCHAIN_BIN' ---------------"
         WD=$(pwd)
         cd $ANDROID_TOOLCHAIN_BIN
         cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
         cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
         cp llvm-nm $HOST-nm
+        ls $HOST-*
         cd $WD
-        echo "after 'cd $ANDROID_TOOLCHAIN_BIN' ---------------"
+        ls -l ./depends/SDKs/android/ndk/24.0.8215888/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android*
 
         CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
