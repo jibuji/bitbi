@@ -71,7 +71,12 @@ jobs:
         POW_HOME=$HOME/pow/pow-$POW_VERSION
         export HOST=aarch64-linux-android
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
-        
+        echo "ls -l $ANDROID_HOME"
+        ls -l $ANDROID_HOME
+        echo "ls -l $ANDROID_NDK_HOME"
+        ls -l $ANDROID_NDK_HOME
+        echo "ls -l $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/"
+        ls -l ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
         O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
