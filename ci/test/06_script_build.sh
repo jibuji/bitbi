@@ -21,7 +21,7 @@ if [ -n "$ANDROID_TOOLS_URL" ]; then
   CI_EXEC make distclean || true
   CI_EXEC ./autogen.sh
   CI_EXEC ./configure "$BITCOIN_CONFIG_ALL" "$BITCOIN_CONFIG" || ( (CI_EXEC cat config.log) && false)
-  CI_EXEC "make $MAKEJOBS src/bitcoind"
+  CI_EXEC "make $MAKEJOBS src/bitbid"
   CI_EXEC "${PRINT_CCACHE_STATISTICS}"
   exit 0
 fi
