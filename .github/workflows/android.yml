@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         config:
-          - {api_level: 28, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
+          - {api_level: 23, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
 
     steps:
     - name: Install dependencies
@@ -57,7 +57,7 @@ jobs:
     - name: Build Bitbid
       run: |
         export DEPENDS_DIR="$HOME"
-        ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
+        export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
         export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
@@ -73,7 +73,7 @@ jobs:
 
 
         export HOST=aarch64-linux-android
-        ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+        exoirt ANDROID_API_LEVEL=${{ matrix.config.api_level }}
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
@@ -85,7 +85,7 @@ jobs:
         ls $HOST-*
         cd $WD
 
-        CONFIG_SHELL= NO_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
+        CONFIG_SHELL= NO_QT=1 make  -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
         echo "HOST=$HOST" >> $GITHUB_ENV
         ./autogen.sh
         BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
