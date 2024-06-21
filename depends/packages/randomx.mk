@@ -12,9 +12,9 @@ endef
 
 define $(package)_config_cmds
     if [ -n "$$ANDROID_NDK_HOME" ]; then \
-        cmake -DCMAKE_TOOLCHAIN_FILE=$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 ..; \
+        cmake -DCMAKE_TOOLCHAIN_FILE=$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 .; \
     else \
-        cmake -DARCH=native ..; \
+        cmake -DARCH=native .; \
     fi
 endef
 
