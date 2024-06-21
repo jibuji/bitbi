@@ -78,7 +78,7 @@ jobs:
         export CCACHE_DIR=$HOME/.ccache
 
         ccache --zero-stats --max-size=$CCACHE_SIZE
-        ./autogen.sh
+
 
         export HOST=aarch64-linux-android
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
@@ -106,7 +106,8 @@ jobs:
         ls -l ./depends/SDKs/android/ndk/24.0.8215888/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android*
 
         CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
-
+        
+        ./autogen.sh
         BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
