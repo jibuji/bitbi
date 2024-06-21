@@ -99,10 +99,13 @@ jobs:
         ls depends
         ls $ANDROID_TOOLCHAIN_BIN
         echo "before 'cd $ANDROID_TOOLCHAIN_BIN' ---------------"
+        WD=$(pwd)
         cd $ANDROID_TOOLCHAIN_BIN
         cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
         cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
         cp llvm-nm $HOST-nm
+        cd $WD
+        echo "after 'cd $ANDROID_TOOLCHAIN_BIN' ---------------"
 
         CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
