@@ -11,7 +11,11 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-	cmake -DARCH=native .
+    if [ -n "$$ANDROID_NDK_HOME" ]; then \
+        cmake -DCMAKE_TOOLCHAIN_FILE=$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-23 ..; \
+    else \
+        cmake -DARCH=native ..; \
+    fi
 endef
 
 define $(package)_build_cmds
