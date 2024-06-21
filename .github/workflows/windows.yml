@@ -54,6 +54,7 @@ jobs:
         ./autogen.sh
         POW_HOME="$HOME/pow"
         ./configure CXXFLAGS="-I/mingw64/include -I/mingw64/include/c++/13.2.0 -I/mingw64/x86_64-w64-mingw32/include -I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -L/mingw64/lib -lsodium -lrandomx" --prefix=/ --with-gui=no --with-wallet=no --disable-tests --disable-bench --disable-zmq
+        mkdir -p depends/x86_64-pc-msys/lib
         make -j$(nproc) ./src/bitbid.exe
 
     - name: Upload config.log
