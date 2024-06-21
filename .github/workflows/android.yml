@@ -100,8 +100,8 @@ jobs:
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
         ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG
 
-        mkdir depends/x86_64-pc-linux-gnu/lib
-        
+        mkdir -p depends/x86_64-pc-linux-gnu/lib
+
         make -j$(nproc) src/bitbid
         mv src/bitbid android-bitbid-${{ matrix.config.abi }}
 
