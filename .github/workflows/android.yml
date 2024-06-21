@@ -21,7 +21,9 @@ jobs:
       run: |
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt update
-        sudo apt install -y git build-essential cmake unzip openjdk-17-jdk ccache
+        sudo apt install -y git build-essential cmake unzip openjdk-17-jdk ccache \
+        build-essential libtool autotools-dev automake pkg-config bsdmainutils curl\
+        ca-certificates python3 rsync cmake git procps bison
         sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
 
@@ -104,7 +106,7 @@ jobs:
         path: |
             ./config.log
             ./depends/config.log
-            ./depends/work/build/aarch64-linux-android/libevent/2.1.12-stable-26ac2726e5f/config.log
+            ./depends/work/build/aarch64-linux-android/libevent/2.1.12-stable-8d8bc582785/config.log
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
