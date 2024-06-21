@@ -37,7 +37,7 @@ jobs:
         ANDROID_BUILD_TOOLS_VERSION=28.0.3
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
         ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
-        export DEPENDS_DIR="./depends"
+        export DEPENDS_DIR="$HOME"
         export ANDROID_TOOLS_URL=https://googledownloads.cn/android/repository/commandlinetools-linux-11076708_latest.zip
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
         mkdir -p "$ANDROID_HOME"
@@ -63,7 +63,7 @@ jobs:
 
     - name: Build Bitbid
       run: |
-        export DEPENDS_DIR="$(pwd)/depends"
+        export DEPENDS_DIR="$HOME"
         ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
@@ -93,16 +93,16 @@ jobs:
         cd $WD
 
         CONFIG_SHELL= NO_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
-
+        echo "HOST=$HOST" >> $GITHUB_ENV
         ./autogen.sh
         BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
-        ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG --host="$HOST"
+        HOST=$HOST ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG --host="$HOST"
 
         mkdir -p depends/x86_64-pc-linux-gnu/lib
 
-        make -j$(nproc) src/bitbid
+        HOST=$HOST make -j$(nproc) src/bitbid
         mv src/bitbid android-bitbid-${{ matrix.config.abi }}
 
     - name: Upload config.log
