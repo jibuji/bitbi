@@ -21,7 +21,7 @@ jobs:
       run: |
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt update
-        sudo apt install -y unzip openjdk-17-jdk gradle build-essential libtool autotools-dev automake pkg-config bsdmainutils curl ca-certificates ccache python3 rsync cmake git procps bison
+        sudo apt install -y  unzip openjdk-17-jdk gradle build-essential libtool autotools-dev automake pkg-config bsdmainutils curl ca-certificates ccache python3 rsync cmake git procps bison
 
 
     - name: Checkout repository
@@ -47,14 +47,13 @@ jobs:
         unzip -o "$ANDROID_TOOLS_PATH" -d "$ANDROID_HOME"
         
         JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-        yes|${ANDROID_HOME}/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
+        yes | "${ANDROID_HOME}"/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
+        ls -l "${ANDROID_HOME}"
 
 
     - name: Build Bitbid
       run: |
-        WD=$(pwd)
-        echo "WD=$WD"
-        export DEPENDS_DIR=$WD/depends
+        export DEPENDS_DIR="$HOME"
         export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
@@ -75,6 +74,7 @@ jobs:
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
+        WD=$(pwd)
         cd $ANDROID_TOOLCHAIN_BIN
         cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
         cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
