@@ -59,7 +59,6 @@ jobs:
         unzip -q commandlinetools-linux-7583922_latest.zip
         rm commandlinetools-linux-7583922_latest.zip
         yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$HOME/SDKs/android "platforms;android-${{ matrix.config.api_level }}" "platform-tools" "build-tools;30.0.3"
-        echo "export ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
         
 
     - name: Build Bitbid
@@ -82,12 +81,6 @@ jobs:
 
         export HOST=aarch64-linux-android
         ANDROID_API_LEVEL=${{ matrix.config.api_level }}
-        echo "ls -l $ANDROID_HOME"
-        ls -l $ANDROID_HOME
-        echo "ls -l $ANDROID_NDK_HOME"
-        ls -l $ANDROID_NDK_HOME
-        echo "ls -l $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
-        ls -l ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
@@ -98,13 +91,11 @@ jobs:
         cp llvm-nm $HOST-nm
         ls $HOST-*
         cd $WD
-        ls -l ./depends/SDKs/android/ndk/24.0.8215888/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android*
 
         CONFIG_SHELL= NO_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
         ./autogen.sh
-        BITBI_CONFIG_ALL=--enable-suppress-external-warnings 
-        BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
+        BITBI_CONFIG_ALL="CONFIG_SITE=depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
         ./configure "$BITBI_CONFIG_ALL" "$BITBI_CONFIG"
         
