@@ -44,7 +44,7 @@ jobs:
         POW_HOME="$HOME/pow"
         ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
         mkdir -p depends/lib
-        make -j src/bitbid
+        make -j$(sysctl -n hw.logicalcpu) src/bitbid
         mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
 
     - name: Upload config.log
