@@ -43,7 +43,7 @@ jobs:
         mkdir -p "$ANDROID_HOME"
         mkdir -p "${DEPENDS_DIR}/sdk-sources"
         export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
-        export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
+        export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         export ANDROID_TOOLS_PATH=${DEPENDS_DIR}/sdk-sources/android-tools.zip
         curl --location --fail "${ANDROID_TOOLS_URL}" -o "$ANDROID_TOOLS_PATH"
         
@@ -60,6 +60,7 @@ jobs:
         rm commandlinetools-linux-7583922_latest.zip
         yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$HOME/SDKs/android "platforms;android-${{ matrix.config.api_level }}" "platform-tools" "build-tools;30.0.3"
         echo "export ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+        
 
     - name: Build Bitbid
       run: |
@@ -85,16 +86,21 @@ jobs:
         ls -l $ANDROID_HOME
         echo "ls -l $ANDROID_NDK_HOME"
         ls -l $ANDROID_NDK_HOME
-        echo "ls -l $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/"
-        ls -l ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/
-        export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/
-        export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/"
+        echo "ls -l $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+        ls -l ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
         echo "${ANDROID_TOOLCHAIN_BIN}" >> $GITHUB_PATH
         echo "export ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
         echo "export ANDROID_NDK=$ANDROID_NDK_HOME" >> $GITHUB_ENV
         echo "export ANDROID_API_LEVEL=$ANDROID_API_LEVEL" >> $GITHUB_ENV
-        echo "export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/" >> $GITHUB_ENV
+        echo "export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
+        cd $ANDROID_TOOLCHAIN_BIN
+        cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
+        cp $HOST$ANDROID_API_LEVEL-clang++ $HOST-clang++
+        cp llvm-nm $HOST-nm
+        
         CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
         BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
