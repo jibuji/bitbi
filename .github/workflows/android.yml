@@ -125,7 +125,7 @@ jobs:
         path: |
             ./config.log
             ./depends/config.log
-            ./depends/work/build/aarch64-linux-android/libevent/2.1.12-stable-8d8bc582785/config.log
+            ./depends/work/build/aarch64-linux-android/libevent/2.1.12-stable-ddeefdd50a1/config.log
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
