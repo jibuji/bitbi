@@ -100,3 +100,36 @@ way. This will install to `c:\workspace\bitbi`, for example:
 You can also create an installer using:
 
     make deploy
+
+## build bitbi on msys2 on Windows 64-bit
+
+### Install msys2
+
+Download from [here] (https://www.msys2.org/) and install it.
+
+Using `MSYS2-MINGW64` terminal to do the following.
+
+### Prepare Building
+
+1. update pacman packages indexes
+ 
+ `pacman -Syu`
+
+2. restart the terminal and do `pacman -Syu` again
+
+3. install requirements
+
+```bash
+pacman -S mingw-w64-x86_64-curl mingw-w64-x86_64-cmake cmake ninja base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-boost mingw-w64-x86_64-qt5 mingw-w64-x86_64-zeromq mingw-w64-x86_64-libevent mingw-w64-x86_64-cppzmq libdb mingw-w64-x86_64-miniupnpc mingw-w64-x86_64-zlib libevent mingw-w64-x86_64-libevent mingw-w64-x86_64-toolchain libtool mingw-w64-x86_64-libtool mingw-w64-x86_64-libsodium
+```
+
+### Building
+
+```bash
+export HOST=x86_64-w64-mingw32
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH
+export CPLUS_INCLUDE_PATH=/mingw64/include:$CPLUS_INCLUDE_PATH
+./autogen.sh
+./configure CXXFLAGS="-I/mingw64/include -I/mingw64/include/c++/13.2.0 -I/mingw64/x86_64-w64-mingw32/include -I/home/code/pow/src" LDFLAGS="-L/home/code/pow/build -L/mingw64/lib -lsodium" --prefix=/ --with-gui=no --disable-tests --disable-bench --disable-zmq
+make -j8
+```

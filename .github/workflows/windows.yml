@@ -1,4 +1,4 @@
-name: build-windows
+name: build-windows-msys2
 
 on:
   push:
@@ -8,13 +8,17 @@ on:
 jobs:
   build-linux:
 
-    timeout-minutes: 30
-    runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 15
+    runs-on: windows-latest
 
     strategy:
       matrix:
         config:
-          - {os: ubuntu-22.04, pow: 0.2.2}
+          - {c: "gcc", cxx: "g++"}
+          
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
     - name: Install dependencies
