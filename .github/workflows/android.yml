@@ -53,13 +53,6 @@ jobs:
         yes | "${ANDROID_HOME}"/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
         ls -l "${ANDROID_HOME}"
 
-        mkdir -p $HOME/SDKs/android
-        cd $HOME/SDKs/android
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
-        unzip -q commandlinetools-linux-7583922_latest.zip
-        rm commandlinetools-linux-7583922_latest.zip
-        yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$HOME/SDKs/android "platforms;android-${{ matrix.config.api_level }}" "platform-tools" "build-tools;30.0.3"
-        
 
     - name: Build Bitbid
       run: |
