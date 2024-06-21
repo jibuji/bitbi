@@ -52,7 +52,7 @@ jobs:
 
     - name: Build Bitbid
       run: |
-        export DEPENDS_DIR="$HOME"
+        export DEPENDS_DIR=$(pwd)/depends
         export ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
         POW_VERSION=${{ matrix.config.pow_version }}
         export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
