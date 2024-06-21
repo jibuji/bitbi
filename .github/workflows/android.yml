@@ -91,11 +91,6 @@ jobs:
         export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
         export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
         echo "DEPOPTS:$DEP_OPTS"
-        # echo "${ANDROID_TOOLCHAIN_BIN}" >> $GITHUB_PATH
-        # echo "export ANDROID_NDK_HOME=$ANDROID_NDK_HOME" >> $GITHUB_ENV
-        # echo "export ANDROID_NDK=$ANDROID_NDK_HOME" >> $GITHUB_ENV
-        # echo "export ANDROID_API_LEVEL=$ANDROID_API_LEVEL" >> $GITHUB_ENV
-        # echo "export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_ENV
         WD=$(pwd)
         cd $ANDROID_TOOLCHAIN_BIN
         cp $HOST$ANDROID_API_LEVEL-clang $HOST-clang
@@ -105,7 +100,7 @@ jobs:
         cd $WD
         ls -l ./depends/SDKs/android/ndk/24.0.8215888/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android*
 
-        CONFIG_SHELL= O_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
+        CONFIG_SHELL= NO_QT=1 make -j$(nproc) -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
 
         ./autogen.sh
         BITBI_CONFIG_ALL=--enable-suppress-external-warnings --disable-dependency-tracking
