@@ -98,7 +98,7 @@ jobs:
         BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
         BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=depends/$HOST/share/config.site"
         BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
-        ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG
+        ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG --host="$HOST"
 
         mkdir -p depends/x86_64-pc-linux-gnu/lib
 
@@ -112,8 +112,6 @@ jobs:
         name: config.log
         path: |
             ./config.log
-            ./depends/config.log
-            ./depends/work/build/aarch64-linux-android/libevent/2.1.12-stable-ddeefdd50a1/config.log
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
