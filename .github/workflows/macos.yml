@@ -2,7 +2,7 @@ name: build-macos
 
 on:
   push:
-    branches: [ "mtest-m" ]
+    branches: [ "mtest" ]
   pull_request:
 
 jobs:
@@ -15,8 +15,8 @@ jobs:
       matrix:
         config:
           - {os: macos-11, pow: 0.2.2}
-          - {os: macos-12, pow: 0.2.2}
-          - {os: macos-12, pow: 0.2.2}
+          # - {os: macos-12, pow: 0.2.2}
+          # - {os: macos-13, pow: 0.2.2}
 
     steps:
     - name: Install dependencies
@@ -45,6 +45,8 @@ jobs:
         ./configure --enable-cxx --disable-shared --with-pic --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
         mkdir -p depends/lib
         make -j$(sysctl -n hw.logicalcpu) src/bitbid
+        chmod +x src/bitbid
+        xattr -d src/bitbid
         mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
     - name: Upload config.log
       if: failure() # Only run this step if a previous step failed
