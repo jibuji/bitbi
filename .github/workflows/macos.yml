@@ -42,7 +42,7 @@ jobs:
         # echo "CXX=$CXX"
         ./autogen.sh
         POW_HOME="$HOME/pow"
-        ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+        ./configure --enable-cxx --disable-shared --with-pic --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
         mkdir -p depends/lib
         make -j$(sysctl -n hw.logicalcpu) src/bitbid
         mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
