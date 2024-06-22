@@ -23,11 +23,12 @@ jobs:
         echo "begin..."
         brew install automake libtool boost pkg-config libevent 
         # download latest version of pow
-        POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
-        POW_HOME="$HOME/pow"
-        mkdir -p $POW_HOME
-        curl -L $POW_URL | tar xz -C $POW_HOME
-        ls -l $POW_HOME
+        # POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
+        # POW_HOME="$HOME/pow"
+        # mkdir -p $POW_HOME
+        # curl -L $POW_URL | tar xz -C $POW_HOME
+        # ls -l $POW_HOME
+
 
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -40,9 +41,12 @@ jobs:
         # export CXX=$(brew --prefix llvm)/bin/clang++
         # echo "CC=$CC"
         # echo "CXX=$CXX"
+        cd depends
+        CONFIG_SHELL= NO_QT=1 make HOST=x86_64-apple-darwin
+        cd ..
         ./autogen.sh
-        POW_HOME="$HOME/pow"
-        ./configure --enable-cxx --disable-shared --with-pic --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+        # POW_HOME="$HOME/pow"
+        ./configure --prefix=`pwd`/depends/x86_64-apple-darwin --enable-cxx --disable-shared --with-pic --without-wallet --with-gui=no --disable-tests --disable-bench  CXXFLAGS="-O2"
         mkdir -p depends/lib
         make -j$(sysctl -n hw.logicalcpu) src/bitbid
         mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
