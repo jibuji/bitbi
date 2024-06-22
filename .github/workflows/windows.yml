@@ -2,7 +2,7 @@ name: build-windows-msys2
 
 on:
   push:
-    branches: [ "mtest-w" ]
+    branches: [ "mtest" ]
   pull_request:
 
 jobs:
