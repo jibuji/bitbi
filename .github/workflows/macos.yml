@@ -14,14 +14,14 @@ jobs:
     strategy:
       matrix:
         config:
-          - {os: macos-11, pow: 0.2.2}
+          - {os: macos-12, pow: 0.2.2}
           # - {os: macos-14, pow: 0.2.2}
 
     steps:
     - name: Install dependencies
       run: |
         echo "begin..."
-        brew install automake libtool boost pkg-config libevent 
+        brew install automake libtool  pkg-config  
         # download latest version of pow
         # POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
         # POW_HOME="$HOME/pow"
