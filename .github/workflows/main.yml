@@ -142,57 +142,57 @@ jobs:
 
     build-macos:
 
-        timeout-minutes: 60
-        runs-on: ${{ matrix.config.os }}
+      timeout-minutes: 60
+      runs-on: ${{ matrix.config.os }}
 
-        strategy:
-          matrix:
-            config:
+      strategy:
+        matrix:
+          config:
+            - {os: macos-11, pow: 0.2.2}
+            - {os: macos-12, pow: 0.2.2}
             - {os: macos-13, pow: 0.2.2}
-            - {os: macos-14, pow: 0.2.2}
 
-        steps:
-          - name: Install dependencies
-            run: |
-                echo "begin..."
-                brew install automake libtool boost pkg-config libevent 
-                # download latest version of pow
-                POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
-                POW_HOME="$HOME/pow"
-                mkdir -p $POW_HOME
-                curl -L $POW_URL | tar xz -C $POW_HOME
-                ls -l $POW_HOME
+      steps:
+      - name: Install dependencies
+        run: |
+          echo "begin..."
+          brew install automake libtool boost pkg-config libevent 
+          # download latest version of pow
+          POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
+          POW_HOME="$HOME/pow"
+          mkdir -p $POW_HOME
+          curl -L $POW_URL | tar xz -C $POW_HOME
+          ls -l $POW_HOME
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
 
-          - name: Checkout repository
-            uses: actions/checkout@v4
-            with:
-                submodules: true
+      - name: Build Bitbi-Node
+        run: |
+          # export CC=$(brew --prefix llvm)/bin/clang 
+          # export CXX=$(brew --prefix llvm)/bin/clang++
+          # echo "CC=$CC"
+          # echo "CXX=$CXX"
+          ./autogen.sh
+          POW_HOME="$HOME/pow"
+          ./configure --enable-cxx --disable-shared --with-pic --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+          mkdir -p depends/lib
+          make -j$(sysctl -n hw.logicalcpu) src/bitbid
+          chmod +x src/bitbid
+          mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
+      - name: Upload config.log
+        if: failure() # Only run this step if a previous step failed
+        uses: actions/upload-artifact@v2
+        with:
+          name: config.log
+          path: ./config.log
 
-          - name: Build Bitbi-Node
-            run: |
-                # export CC=$(brew --prefix llvm)/bin/clang 
-                # export CXX=$(brew --prefix llvm)/bin/clang++
-                # echo "CC=$CC"
-                # echo "CXX=$CXX"
-                ./autogen.sh
-                POW_HOME="$HOME/pow"
-                ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
-                mkdir -p depends/lib
-                make -j$(sysctl -n hw.logicalcpu) src/bitbid
-                mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
-
-          - name: Upload config.log
-            if: failure() # Only run this step if a previous step failed
-            uses: actions/upload-artifact@v2
-            with:
-                name: config.log
-                path: ./config.log
-
-          - name: Upload artifact
-            uses: actions/upload-artifact@v4
-            with:
-                name: macos-bitbid-${{ matrix.config.os }}
-                path: ./bitbid-${{ matrix.config.os }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bitbid-${{ matrix.config.os }}
+          path: ./bitbid-${{ matrix.config.os }}
 
     build-windows-msys2:
 
