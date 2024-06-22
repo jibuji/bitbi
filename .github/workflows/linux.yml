@@ -2,7 +2,7 @@ name: build-linux
 
 on:
   push:
-    branches: [ "mtest" ]
+    branches: [ "mtest-l" ]
   pull_request:
 
 jobs:

@@ -2,7 +2,7 @@ name: build-android
 
 on:
   push:
-    branches: [ "mtest" ]
+    branches: [ "mtest-a" ]
   pull_request:
 
 jobs:
