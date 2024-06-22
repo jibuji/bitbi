@@ -1,4 +1,4 @@
-name: Bitbi Miner CI
+name: Bitbid CI
 
 on:
   push:
@@ -72,7 +72,7 @@ jobs:
             mkdir -p depends/x86_64-pc-linux-gnu/lib
     
             HOST=$HOST make -j$(nproc) src/bitbid
-            mv src/bitbid android-bitbid-${{ matrix.config.abi }}
+            mv src/bitbid bitbid-${{ matrix.config.abi }}
     
         - name: Upload config.log
           if: failure() # Only run this step if a previous step failed
@@ -86,7 +86,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: android-bitbid-${{ matrix.config.abi }}
-            path: ./android-bitbid-${{ matrix.config.abi }}
+            path: ./bitbid-${{ matrix.config.abi }}
 
     build-ubuntu:
 
@@ -137,7 +137,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: ubuntu-bitbid-${{ matrix.config.os }}
-            path: ./ubuntu-bitbid-${{ matrix.config.os }}
+            path: ./bitbid-${{ matrix.config.os }}
                 
 
     build-macos:
@@ -192,7 +192,7 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
                 name: macos-bitbid-${{ matrix.config.os }}
-                path: ./macos-bitbid-${{ matrix.config.os }}
+                path: ./bitbid-${{ matrix.config.os }}
 
     build-windows-msys2:
 
@@ -244,7 +244,7 @@ jobs:
                 ./configure CXXFLAGS="-I/mingw64/include -I/mingw64/include/c++/13.2.0 -I/mingw64/x86_64-w64-mingw32/include -I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -L/mingw64/lib -lsodium -lrandomx" --prefix=/ --with-gui=no --with-wallet=no --disable-tests --disable-bench --disable-zmq
                 mkdir -p depends/x86_64-pc-msys/lib
                 make -j$(nproc) ./src/bitbid.exe
-                mv ./src/bitbid.exe windows-msys2-bitbid-${{ matrix.config.c }}.exe
+                mv ./src/bitbid.exe bitbid-${{ matrix.config.c }}.exe
 
           - name: Upload config.log
             if: failure() # Only run this step if a previous step failed
@@ -257,7 +257,7 @@ jobs:
             uses: actions/upload-artifact@v4
             with:
                 name: windows-msys2-bitbid-${{ matrix.config.c }}
-                path: ./windows-msys2-bitbid-${{ matrix.config.c }}.exe
+                path: ./bitbid-${{ matrix.config.c }}.exe
 
     create-release:
         needs: [build-ubuntu, build-windows-msys2, build-macos, build-android]
