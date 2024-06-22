@@ -1,0 +1,285 @@
+name: Bitbi Miner CI
+
+on:
+  push:
+    tags: [ "v*.*.*" ]
+    # branches: ["integrate"]
+  pull_request:
+
+jobs:
+    build-android:
+
+        timeout-minutes: 15
+        runs-on: ubuntu-22.04
+    
+        strategy:
+          matrix:
+            config:
+              - {api_level: 23, ndk_version: 24.0.8215888, abi: arm64-v8a, pow_version: 0.2.2}
+    
+        steps:
+        - name: Install dependencies
+          run: |
+            sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+            sudo apt update
+            sudo apt install -y  unzip openjdk-17-jdk gradle build-essential libtool autotools-dev automake pkg-config bsdmainutils curl ca-certificates ccache python3 rsync cmake git procps bison
+    
+    
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            submodules: true
+    
+        - name: Install Android SDK & make dependencies
+          run: |
+            ANDROID_BUILD_TOOLS_VERSION=28.0.3
+            ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+            ANDROID_NDK_VERSION=${{ matrix.config.ndk_version }}
+            export WD=$(pwd)
+            export DEPENDS_DIR=$WD/depends
+            export ANDROID_TOOLS_URL=https://googledownloads.cn/android/repository/commandlinetools-linux-11076708_latest.zip
+            export ANDROID_HOME="${DEPENDS_DIR}/SDKs/android"
+            mkdir -p "$ANDROID_HOME"
+            mkdir -p "${DEPENDS_DIR}/sdk-sources"
+            export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${ANDROID_NDK_VERSION}"
+            export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+            export ANDROID_TOOLS_PATH=${DEPENDS_DIR}/sdk-sources/android-tools.zip
+            curl --location --fail "${ANDROID_TOOLS_URL}" -o "$ANDROID_TOOLS_PATH"
+            
+            unzip -o "$ANDROID_TOOLS_PATH" -d "$ANDROID_HOME"
+            
+            JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+            yes | "${ANDROID_HOME}"/cmdline-tools/bin/sdkmanager --sdk_root="${ANDROID_HOME}" --install "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "platforms;android-${ANDROID_API_LEVEL}" "ndk;${ANDROID_NDK_VERSION}"
+    
+            export HOST=aarch64-linux-android
+            export ANDROID_API_LEVEL=${{ matrix.config.api_level }}
+            export ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin
+            export DEP_OPTS="ANDROID_SDK=${ANDROID_HOME} ANDROID_NDK=${ANDROID_NDK_HOME} ANDROID_API_LEVEL=${ANDROID_API_LEVEL} ANDROID_TOOLCHAIN_BIN=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin"
+            CONFIG_SHELL= NO_QT=1 make  -C depends HOST="$HOST" "$DEP_OPTS" LOG=1
+            
+        - name: Build Bitbid
+          run: |
+            export WD=$(pwd)
+    
+            export HOST=aarch64-linux-android
+    
+            ./autogen.sh
+            BITBI_CONFIG_ALL="--enable-suppress-external-warnings --disable-dependency-tracking"
+            BITBI_CONFIG_ALL="${BITBI_CONFIG_ALL} CONFIG_SITE=$WD/depends/$HOST/share/config.site"
+            BITBI_CONFIG="--disable-tests --without-wallet --disable-gui-tests --disable-bench --disable-fuzz-binary --without-utils --without-libs --without-gui --with-daemon"
+            HOST=$HOST ./configure $BITBI_CONFIG_ALL $BITBI_CONFIG --host="$HOST"
+    
+            mkdir -p depends/x86_64-pc-linux-gnu/lib
+    
+            HOST=$HOST make -j$(nproc) src/bitbid
+            mv src/bitbid android-bitbid-${{ matrix.config.abi }}
+    
+        - name: Upload config.log
+          if: failure() # Only run this step if a previous step failed
+          uses: actions/upload-artifact@v2
+          with:
+            name: config.log
+            path: |
+                ./config.log
+    
+        - name: Upload artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: android-bitbid-${{ matrix.config.abi }}
+            path: ./android-bitbid-${{ matrix.config.abi }}
+
+    build-ubuntu:
+
+        timeout-minutes: 30
+        runs-on: ${{ matrix.config.os }}
+
+        strategy:
+          matrix:
+            config:
+            - {os: ubuntu-22.04, pow: 0.2.2}
+
+        steps:
+        - name: Install dependencies
+          run: |
+            echo "begin..."
+            sudo apt-get -y install libsqlite3-dev libminiupnpc-dev libnatpmp-dev \
+            build-essential libtool autotools-dev automake pkg-config bsdmainutils \
+            python3 libevent-dev libboost-dev
+            # download latest version of pow
+            POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/ubuntu-${{matrix.config.os}}.tar.gz"
+            POW_HOME="$HOME/pow"
+            mkdir -p $POW_HOME
+            curl -L $POW_URL | tar xz -C $POW_HOME
+            ls -l $POW_HOME
+
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            submodules: true
+
+        - name: Build Bitbi-Node
+          run: |
+            ./autogen.sh
+            POW_HOME="$HOME/pow"
+            ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+            mkdir -p depends/x86_64-pc-linux-gnu/lib
+            make -j$(nproc) src/bitbid
+            mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
+
+        - name: Upload config.log
+          if: failure() # Only run this step if a previous step failed
+          uses: actions/upload-artifact@v2
+          with:
+            name: config.log
+            path: ./config.log
+
+        - name: Upload artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: ubuntu-bitbid-${{ matrix.config.os }}
+            path: ./ubuntu-bitbid-${{ matrix.config.os }}
+                
+
+    build-macos:
+
+        timeout-minutes: 60
+        runs-on: ${{ matrix.config.os }}
+
+        strategy:
+          matrix:
+            config:
+            - {os: macos-13, pow: 0.2.2}
+            - {os: macos-14, pow: 0.2.2}
+
+        steps:
+          - name: Install dependencies
+            run: |
+                echo "begin..."
+                brew install automake libtool boost pkg-config libevent 
+                # download latest version of pow
+                POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/macos-${{matrix.config.os}}.tar.gz"
+                POW_HOME="$HOME/pow"
+                mkdir -p $POW_HOME
+                curl -L $POW_URL | tar xz -C $POW_HOME
+                ls -l $POW_HOME
+
+          - name: Checkout repository
+            uses: actions/checkout@v4
+            with:
+                submodules: true
+
+          - name: Build Bitbi-Node
+            run: |
+                # export CC=$(brew --prefix llvm)/bin/clang 
+                # export CXX=$(brew --prefix llvm)/bin/clang++
+                # echo "CC=$CC"
+                # echo "CXX=$CXX"
+                ./autogen.sh
+                POW_HOME="$HOME/pow"
+                ./configure --without-wallet --with-gui=no --disable-tests --disable-bench CPPFLAGS="-I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -lrandomx" CXXFLAGS="-O2"
+                mkdir -p depends/lib
+                make -j$(sysctl -n hw.logicalcpu) src/bitbid
+                mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
+
+          - name: Upload config.log
+            if: failure() # Only run this step if a previous step failed
+            uses: actions/upload-artifact@v2
+            with:
+                name: config.log
+                path: ./config.log
+
+          - name: Upload artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: macos-bitbid-${{ matrix.config.os }}
+                path: ./macos-bitbid-${{ matrix.config.os }}
+
+    build-windows-msys2:
+
+        timeout-minutes: 15
+        runs-on: windows-latest
+
+        strategy:
+         matrix:
+            config:
+            - {c: "gcc", cxx: "g++", pow: 0.2.2,}
+
+        defaults:
+          run:
+            shell: msys2 {0}
+
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+            with:
+                submodules: true
+
+          - name: Setup MSYS2
+            uses: eine/setup-msys2@v2
+            with:
+                update: true
+                install: autoconf automake mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-cmake make
+                    mingw-w64-x86_64-curl cmake ninja base-devel  mingw-w64-x86_64-boost 
+                    mingw-w64-x86_64-zeromq mingw-w64-x86_64-cppzmq libdb 
+                    mingw-w64-x86_64-miniupnpc mingw-w64-x86_64-zlib libevent mingw-w64-x86_64-libevent 
+                    mingw-w64-x86_64-toolchain libtool mingw-w64-x86_64-libtool mingw-w64-x86_64-libsodium
+            
+          - name: Install dependencies
+            run: |
+                echo "begin... pow ..."
+                # download latest version of pow
+                POW_URL="https://github.com/bitbi-core/pow/releases/download/v${{matrix.config.pow}}/windows-msys2-${{matrix.config.c}}.tar.gz"
+                POW_HOME="$HOME/pow"
+                mkdir -p $POW_HOME
+                curl -L $POW_URL | tar xz -C $POW_HOME
+                ls -l $POW_HOME
+
+          - name: Build Bitbi-Node
+            run: |
+                export HOST=x86_64-w64-mingw32
+                export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH
+                export CPLUS_INCLUDE_PATH=/mingw64/include:$CPLUS_INCLUDE_PATH
+                ./autogen.sh
+                POW_HOME="$HOME/pow"
+                ./configure CXXFLAGS="-I/mingw64/include -I/mingw64/include/c++/13.2.0 -I/mingw64/x86_64-w64-mingw32/include -I$POW_HOME/include" LDFLAGS="-L$POW_HOME/lib -L/mingw64/lib -lsodium -lrandomx" --prefix=/ --with-gui=no --with-wallet=no --disable-tests --disable-bench --disable-zmq
+                mkdir -p depends/x86_64-pc-msys/lib
+                make -j$(nproc) ./src/bitbid.exe
+                mv ./src/bitbid.exe windows-msys2-bitbid-${{ matrix.config.c }}.exe
+
+          - name: Upload config.log
+            if: failure() # Only run this step if a previous step failed
+            uses: actions/upload-artifact@v2
+            with:
+                name: config.log
+                path: ./config.log
+
+          - name: Upload artifact
+            uses: actions/upload-artifact@v4
+            with:
+                name: windows-msys2-bitbid-${{ matrix.config.c }}
+                path: ./windows-msys2-bitbid-${{ matrix.config.c }}.exe
+
+    create-release:
+        needs: [build-ubuntu, build-windows-msys2, build-macos, build-android]
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Download all artifacts
+          uses: actions/download-artifact@v4
+            
+        - name: Display structure of downloaded files
+          run: ls -R
+
+        - name: Upload Release Assets
+          uses: softprops/action-gh-release@v2
+          with:
+            files: |
+                ubuntu-bitbid*
+                windows-msys2-bitbid*
+                macos-bitbid*
+                android-bitbid*
+
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
