@@ -46,7 +46,6 @@ jobs:
         mkdir -p depends/lib
         make -j$(sysctl -n hw.logicalcpu) src/bitbid
         chmod +x src/bitbid
-        xattr -d src/bitbid
         mv ./src/bitbid ./bitbid-${{ matrix.config.os }}
     - name: Upload config.log
       if: failure() # Only run this step if a previous step failed
